@@ -1,26 +1,64 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { AppProvider, useAppContext } from './AppContext';
 
-function App() {
+// Componente funcional para el formulario de entrada
+const InputForm: React.FC = () => {
+  const { addItem } = useAppContext();
+  const [inputText, setInputText] = useState<string>('');
+
+  const handleAddItem = () => {
+    if (inputText.trim() !== '') {
+      addItem(inputText);
+      setInputText('');
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <input
+        type="text"
+        value={inputText}
+        onChange={(e) => setInputText(e.target.value)}
+        placeholder="Ingrese un elemento..."
+      />
+      <button onClick={handleAddItem}>Agregar</button>
     </div>
   );
-}
+};
 
-export default App;
+// Componente funcional para la lista de elementos
+const ItemList: React.FC = () => {
+  const { itemList, removeItem } = useAppContext();
+
+  return (
+    <ul>
+      {itemList.map((item) => (
+        <li key={item.id} onClick={() => removeItem(item.id)} style={{ cursor: 'pointer' }}>
+          {item.text}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+// Componente principal que engloba los componentes anteriores
+const App: React.FC = () => {
+  return (
+    <div>
+      <h1>Lista de Elementos</h1>
+      <InputForm />
+      <ItemList />
+    </div>
+  );
+};
+
+// Componente wrapper que proporciona el contexto a la aplicación
+const AppWrapper: React.FC = () => {
+  return (
+    <AppProvider>
+      <App />
+    </AppProvider>
+  );
+};
+
+export default AppWrapper;
